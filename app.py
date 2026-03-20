@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
+import io
 
 # Page settings
 st.set_page_config(page_title="Electrical Virtual Lab", layout="centered")
@@ -47,8 +48,15 @@ st.write("1. What is slip?")
 st.write("2. Condition for maximum torque?")
 st.write("3. Effect of rotor resistance?")
 
-# Download option (basic)
-if st.button("Download Data"):
-    data = np.column_stack((s, T))
-    np.savetxt("torque_slip.csv", data, delimiter=",", header="Slip,Torque", comments='')
-    st.success("Data saved as torque_slip.csv")
+# Download CSV (correct way for web)
+csv_buffer = io.StringIO()
+csv_buffer.write("Slip,Torque\n")
+for i in range(len(s)):
+    csv_buffer.write(f"{s[i]},{T[i]}\n")
+
+st.download_button(
+    label="📥 Download Data",
+    data=csv_buffer.getvalue(),
+    file_name="torque_slip.csv",
+    mime="text/csv"
+)
